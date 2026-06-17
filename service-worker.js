@@ -7,7 +7,7 @@ const ASSETS_TO_CACHE = [
 	'pwa.js',
 	'manifest.json',
 	'favicon.ico.ico',
-	'logo.png.png',
+	'imbe.png.png',
 	'previ.png.jpeg'
 ];
 
