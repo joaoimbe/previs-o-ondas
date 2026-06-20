@@ -1,9 +1,9 @@
-const CACHE_NAME = 'previsao-das-ondas-v3';
+const CACHE_NAME = 'previsao-das-ondas-v4';
 const ASSETS_TO_CACHE = [
 	'.',
 	'index.html',
-	'style.css',
-	'script.js',
+	'style.css?v=20260620-4',
+	'script.js?v=20260620-4',
 	'pwa.js',
 	'manifest.json',
 	'favicon.ico.ico',
@@ -19,6 +19,7 @@ const NETWORK_FIRST_URLS = [
 const SHELL_NETWORK_FIRST = [
 	'/',
 	'/index.html',
+	'/style.css',
 	'/script.js',
 	'/pwa.js',
 	'/manifest.json'

@@ -9,6 +9,9 @@
     --text: #f4f8fb;
     --muted: #c2cfda;
     --accent: #7fdcff;
+    --radius: 22px;
+    --radius-sm: 18px;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.24);
 }
 
 html {
@@ -19,7 +22,8 @@ body {
     margin: 0;
     min-height: 100vh;
     width: 100%;
-    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
     color: var(--text);
     background-color: #050b14;
     background-image:
@@ -28,7 +32,7 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: scroll;
+    background-attachment: fixed;
 }
 
 body::before {
@@ -46,39 +50,47 @@ main,
     z-index: 1;
 }
 
+main {
+    display: grid;
+    gap: 24px;
+    padding-bottom: 32px;
+}
+
 .site-header,
 .footer,
 .hero,
 .forecast-grid,
 .content-section {
-    width: min(1100px, calc(100% - 32px));
+    width: min(1120px, calc(100% - 40px));
     margin: 0 auto;
 }
 
 .footer {
     display: grid;
     gap: 14px;
-    padding: 0 0 28px;
+    padding: 0 0 32px;
 }
 
 .site-header {
-    display: grid;
-    gap: 20px;
-    padding: 28px 0 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 32px 0 10px;
 }
 
 .header-title-group {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
 }
 
 .surf-logo {
-    width: 92px;
-    height: 92px;
+    width: 96px;
+    height: 96px;
     object-fit: cover;
-    flex: 0 0 92px;
-    border-radius: 22px;
+    flex: 0 0 96px;
+    border-radius: var(--radius);
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
 }
@@ -96,23 +108,32 @@ main,
 .site-header h1,
 .hero h2,
 .content-section h2,
-.forecast-grid h2,
-.forecast-card h3 {
+.forecast-grid h2 {
     margin: 0;
-}
-
-.site-header h1 {
-    font-size: clamp(1.9rem, 3vw, 3rem);
 }
 
 .search-container {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
+    align-items: center;
+}
+
+.forecast-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: initial;
+}
+
+.forecast-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+    gap: 16px;
 }
 
 .search-container input {
-    flex: 1 1 240px;
+    flex: 1 1 300px;
     min-width: 0;
     padding: 14px 16px;
     border: 1px solid rgba(255, 255, 255, 0.18);
@@ -120,6 +141,7 @@ main,
     background: rgba(255, 255, 255, 0.08);
     color: var(--text);
     outline: none;
+    font-size: 0.98rem;
 }
 
 .search-container input::placeholder {
@@ -127,18 +149,23 @@ main,
 }
 
 .search-container button {
-    padding: 14px 20px;
+    padding: 14px 22px;
     border: 0;
     border-radius: 14px;
     background: linear-gradient(135deg, #6bd5ff, #3bb7e8);
     color: #04111c;
     font-weight: 700;
     cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.search-container button:hover {
+    transform: translateY(-1px);
 }
 
 .site-nav {
     display: flex;
-    gap: 14px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
@@ -149,16 +176,17 @@ main,
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
 }
 
 .hero,
 .content-section,
 .forecast-grid {
-    margin-bottom: 24px;
+    margin-bottom: 0;
 }
 
 .hero {
-    padding: 72px 0 36px;
+    padding: 48px 0 10px;
 }
 
 .hero-content,
@@ -168,8 +196,8 @@ main,
     background: rgba(8, 16, 28, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    border-radius: 24px;
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.24);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
 }
 
 .hero-content,
@@ -181,8 +209,8 @@ main,
 
 .hero-content {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
-    gap: 20px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.9fr);
+    gap: 24px;
     align-items: center;
 }
 
@@ -192,10 +220,10 @@ main,
 
 .hero-image {
     width: 100%;
-    min-height: 220px;
+    min-height: 240px;
     height: 100%;
     object-fit: cover;
-    border-radius: 20px;
+    border-radius: var(--radius-sm);
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
 }
@@ -203,7 +231,7 @@ main,
 .hero h2 {
     font-size: clamp(2rem, 5vw, 3.8rem);
     line-height: 1.05;
-    max-width: 10ch;
+    max-width: 12ch;
 }
 
 .hero p,
@@ -211,31 +239,110 @@ main,
 .forecast-card p {
     color: var(--muted);
     line-height: 1.6;
+    margin: 0;
 }
 
 .forecast-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 18px;
-    align-items: stretch;
+    margin-top: 0;
 }
 
-.forecast-grid > h2 {
-    grid-column: 1 / -1;
+.forecast-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 165px;
+    height: 100%;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+    background: linear-gradient(160deg, rgba(6, 18, 38, 0.88), rgba(3, 13, 32, 0.82));
+    opacity: 0;
+    transform: translateY(14px);
+    animation: forecastCardEnter 0.55s ease forwards;
 }
 
-    .forecast-status {
-        margin: 0 0 16px;
-        color: var(--muted);
-        font-size: 0.98rem;
-    }
+.forecast-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(127, 220, 255, 0.35);
+}
 
+.forecast-card:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.forecast-card:nth-child(2) {
+    animation-delay: 0.12s;
+}
+
+.forecast-card:nth-child(3) {
+    animation-delay: 0.19s;
+}
+
+.forecast-card:nth-child(4) {
+    animation-delay: 0.26s;
+}
+
+.forecast-card:nth-child(5) {
+    animation-delay: 0.33s;
+}
+
+.forecast-card h3 {
+    display: flex;
+    align-items: center;
     gap: 10px;
+    min-height: 52px;
+    font-size: 1rem;
+}
+
+.forecast-status {
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: 0.98rem;
 }
 
 .forecast-card p {
-    margin-bottom: 0;
+    margin: 0;
+    margin-top: auto;
     font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.forecast-trend {
+    margin-top: 8px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.forecast-trend.is-up {
+    color: #73f8c2;
+}
+
+.forecast-trend.is-down {
+    color: #ff9ea6;
+}
+
+.forecast-trend.is-neutral {
+    color: #a8b8c8;
+}
+
+@keyframes forecastCardEnter {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .forecast-card {
+        opacity: 1;
+        transform: none;
+        animation: none;
+    }
 }
 
 .forecast-symbol {
@@ -253,6 +360,7 @@ main,
 
 .content-section {
     margin-top: 0;
+    padding: 28px 24px;
 }
 
 .footer-label {
@@ -304,9 +412,15 @@ main,
     border: 0;
 }
 
+@media (max-width: 980px) {
+    .forecast-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 700px) {
     .site-header {
-        padding-top: 20px;
+        padding-top: 24px;
     }
 
     .header-title-group {
@@ -320,7 +434,7 @@ main,
     }
 
     .hero {
-        padding-top: 36px;
+        padding-top: 32px;
     }
 
     .hero-content {
@@ -329,6 +443,10 @@ main,
 
     .hero-image {
         min-height: 180px;
+    }
+
+    .forecast-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .hero-content,
@@ -344,6 +462,21 @@ main,
     .forecast-grid,
     .content-section,
     .footer {
-        width: min(1100px, calc(100% - 24px));
+        width: min(1120px, calc(100% - 24px));
+    }
+}
+
+@media (max-width: 520px) {
+    .forecast-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .search-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-container button {
+        width: 100%;
     }
 }

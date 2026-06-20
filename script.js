@@ -18,8 +18,12 @@ const beachKeywords = [
 const forecastElements = {
 	status: document.querySelector('#forecast-status'),
 	waveHeight: document.querySelector('#wave-height'),
+	waveTrend: document.querySelector('#wave-trend'),
 	windSpeed: document.querySelector('#wind-speed'),
+	windTrend: document.querySelector('#wind-trend'),
 	period: document.querySelector('#wave-period'),
+	waterTemp: document.querySelector('#water-temp'),
+	windDirection: document.querySelector('#wind-direction'),
 };
 
 const defaultLocation = {
@@ -66,24 +70,25 @@ function redirectIfSurfBeach(event) {
 }
 
 function getForecastUrl(location) {
-	return `https://marine-api.open-meteo.com/v1/marine?latitude=${location.latitude}&longitude=${location.longitude}&hourly=wave_height,wave_period&timezone=America/Sao_Paulo`;
+	return `https://marine-api.open-meteo.com/v1/marine?latitude=${location.latitude}&longitude=${location.longitude}&hourly=wave_height,wave_period,sea_surface_temperature&timezone=America/Sao_Paulo`;
 }
 
 function getWindForecastUrl(location) {
-	return `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&hourly=windspeed_10m&timezone=America/Sao_Paulo`;
+	return `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&hourly=windspeed_10m,winddirection_10m&timezone=America/Sao_Paulo`;
 }
 
 function getNearestTimeIndex(hourly) {
 	const now = new Date();
+	const times = hourly?.time || [];
 
-	for (let i = 0; i < hourly.time.length; i += 1) {
-		const forecastTime = new Date(`${hourly.time[i]}:00`);
+	for (let i = 0; i < times.length; i += 1) {
+		const forecastTime = new Date(times[i]);
 		if (forecastTime.getTime() >= now.getTime()) {
 			return i;
 		}
 	}
 
-	return hourly.time.length - 1;
+	return Math.max(times.length - 1, 0);
 }
 
 function formatMeterValue(value) {
@@ -98,9 +103,54 @@ function formatPeriodValue(value) {
 	return value == null ? '—' : `${value.toFixed(1)} s`;
 }
 
-function updateForecastDisplay(locationLabel, waveHeight, windSpeed, period, forecastTime) {
+function formatTemperatureValue(value) {
+	return value == null ? '—' : `${value.toFixed(1)} °C`;
+}
+
+function formatWindDirectionValue(value) {
+	if (value == null) {
+		return '—';
+	}
+
+	const directions = ['norte', 'nordeste', 'leste', 'sudeste', 'sul', 'sudoeste', 'oeste', 'noroeste'];
+	const normalized = ((Math.round(value) % 360) + 360) % 360;
+	const index = Math.round(normalized / 45) % directions.length;
+	return `${directions[index]} (${normalized}°)`;
+}
+
+function getTrend(currentValue, previousValue, threshold = 0) {
+	if (currentValue == null || previousValue == null) {
+		return {
+			label: 'Tendência: —',
+			className: 'is-neutral',
+		};
+	}
+
+	const delta = currentValue - previousValue;
+
+	if (delta > threshold) {
+		return {
+			label: '▲ subindo',
+			className: 'is-up',
+		};
+	}
+
+	if (delta < -threshold) {
+		return {
+			label: '▼ caindo',
+			className: 'is-down',
+		};
+	}
+
+	return {
+		label: '● estável',
+		className: 'is-neutral',
+	};
+}
+
+function updateForecastDisplay(locationLabel, waveHeight, previousWaveHeight, windSpeed, previousWindSpeed, period, waterTemp, windDirection, forecastTime) {
 	const formattedTime = forecastTime
-		? new Date(`${forecastTime}:00`).toLocaleString('pt-BR', {
+		? new Date(forecastTime).toLocaleString('pt-BR', {
 			year: 'numeric',
 			month: '2-digit',
 			day: '2-digit',
@@ -113,6 +163,21 @@ function updateForecastDisplay(locationLabel, waveHeight, windSpeed, period, for
 	forecastElements.waveHeight.textContent = formatMeterValue(waveHeight);
 	forecastElements.windSpeed.textContent = formatWindValue(windSpeed);
 	forecastElements.period.textContent = formatPeriodValue(period);
+	forecastElements.waterTemp.textContent = formatTemperatureValue(waterTemp);
+	forecastElements.windDirection.textContent = formatWindDirectionValue(windDirection);
+
+	const waveTrend = getTrend(waveHeight, previousWaveHeight, 0.03);
+	const windTrend = getTrend(windSpeed, previousWindSpeed, 0.2);
+
+	if (forecastElements.waveTrend) {
+		forecastElements.waveTrend.textContent = waveTrend.label;
+		forecastElements.waveTrend.className = `forecast-trend ${waveTrend.className}`;
+	}
+
+	if (forecastElements.windTrend) {
+		forecastElements.windTrend.textContent = windTrend.label;
+		forecastElements.windTrend.className = `forecast-trend ${windTrend.className}`;
+	}
 }
 
 async function loadForecast(location = defaultLocation) {
@@ -123,29 +188,35 @@ async function loadForecast(location = defaultLocation) {
 	forecastElements.status.textContent = `Carregando previsão de ${location.label}...`;
 
 	try {
-		const [waveResponse, windResponse] = await Promise.all([
+		const [marineResponse, windResponse] = await Promise.all([
 			fetch(getForecastUrl(location)),
 			fetch(getWindForecastUrl(location)),
 		]);
 
-		if (!waveResponse.ok) {
-			throw new Error(`Erro ao obter previsão das ondas: ${waveResponse.status}`);
+		if (!marineResponse.ok) {
+			throw new Error(`Erro ao obter previsão do mar: ${marineResponse.status}`);
 		}
 		if (!windResponse.ok) {
 			throw new Error(`Erro ao obter previsão do vento: ${windResponse.status}`);
 		}
 
-		const waveData = await waveResponse.json();
+		const marineData = await marineResponse.json();
 		const windData = await windResponse.json();
-		const index = getNearestTimeIndex(waveData.hourly);
-		const windSpeed = windData.hourly?.windspeed_10m?.[index] ?? null;
+		const marineHourly = marineData.hourly || {};
+		const windHourly = windData.hourly || {};
+		const index = getNearestTimeIndex(marineHourly);
+		const previousIndex = Math.max(index - 1, 0);
 
 		updateForecastDisplay(
 			location.label,
-			waveData.hourly.wave_height[index],
-			windSpeed,
-			waveData.hourly.wave_period[index],
-			waveData.hourly.time[index],
+			marineHourly.wave_height?.[index] ?? null,
+			marineHourly.wave_height?.[previousIndex] ?? null,
+			windHourly.windspeed_10m?.[index] ?? null,
+			windHourly.windspeed_10m?.[previousIndex] ?? null,
+			marineHourly.wave_period?.[index] ?? null,
+			marineHourly.sea_surface_temperature?.[index] ?? null,
+			windHourly.winddirection_10m?.[index] ?? null,
+			marineHourly.time?.[index] ?? null,
 		);
 	} catch (error) {
 		forecastElements.status.textContent = 'Falha ao carregar a previsão. Verifique sua conexão.';
