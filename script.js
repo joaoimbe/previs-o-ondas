@@ -23,7 +23,9 @@ const forecastElements = {
 	windTrend: document.querySelector('#wind-trend'),
 	period: document.querySelector('#wave-period'),
 	waterTemp: document.querySelector('#water-temp'),
+	airTemp: document.querySelector('#air-temp'),
 	windDirection: document.querySelector('#wind-direction'),
+	swellDirection: document.querySelector('#swell-direction'),
 };
 
 const defaultLocation = {
@@ -70,11 +72,11 @@ function redirectIfSurfBeach(event) {
 }
 
 function getForecastUrl(location) {
-	return `https://marine-api.open-meteo.com/v1/marine?latitude=${location.latitude}&longitude=${location.longitude}&hourly=wave_height,wave_period,sea_surface_temperature&timezone=America/Sao_Paulo`;
+	return `https://marine-api.open-meteo.com/v1/marine?latitude=${location.latitude}&longitude=${location.longitude}&hourly=wave_height,wave_period,wave_direction,sea_surface_temperature&timezone=America/Sao_Paulo`;
 }
 
 function getWindForecastUrl(location) {
-	return `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&hourly=windspeed_10m,winddirection_10m&timezone=America/Sao_Paulo`;
+	return `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&hourly=temperature_2m,windspeed_10m,winddirection_10m&timezone=America/Sao_Paulo`;
 }
 
 function getNearestTimeIndex(hourly) {
@@ -107,7 +109,7 @@ function formatTemperatureValue(value) {
 	return value == null ? '—' : `${value.toFixed(1)} °C`;
 }
 
-function formatWindDirectionValue(value) {
+function formatDirectionValue(value) {
 	if (value == null) {
 		return '—';
 	}
@@ -148,7 +150,19 @@ function getTrend(currentValue, previousValue, threshold = 0) {
 	};
 }
 
-function updateForecastDisplay(locationLabel, waveHeight, previousWaveHeight, windSpeed, previousWindSpeed, period, waterTemp, windDirection, forecastTime) {
+function updateForecastDisplay(
+	locationLabel,
+	waveHeight,
+	previousWaveHeight,
+	windSpeed,
+	previousWindSpeed,
+	period,
+	waterTemp,
+	airTemp,
+	windDirection,
+	swellDirection,
+	forecastTime,
+) {
 	const formattedTime = forecastTime
 		? new Date(forecastTime).toLocaleString('pt-BR', {
 			year: 'numeric',
@@ -164,7 +178,13 @@ function updateForecastDisplay(locationLabel, waveHeight, previousWaveHeight, wi
 	forecastElements.windSpeed.textContent = formatWindValue(windSpeed);
 	forecastElements.period.textContent = formatPeriodValue(period);
 	forecastElements.waterTemp.textContent = formatTemperatureValue(waterTemp);
-	forecastElements.windDirection.textContent = formatWindDirectionValue(windDirection);
+	if (forecastElements.airTemp) {
+		forecastElements.airTemp.textContent = formatTemperatureValue(airTemp);
+	}
+	forecastElements.windDirection.textContent = formatDirectionValue(windDirection);
+	if (forecastElements.swellDirection) {
+		forecastElements.swellDirection.textContent = formatDirectionValue(swellDirection);
+	}
 
 	const waveTrend = getTrend(waveHeight, previousWaveHeight, 0.03);
 	const windTrend = getTrend(windSpeed, previousWindSpeed, 0.2);
@@ -215,7 +235,9 @@ async function loadForecast(location = defaultLocation) {
 			windHourly.windspeed_10m?.[previousIndex] ?? null,
 			marineHourly.wave_period?.[index] ?? null,
 			marineHourly.sea_surface_temperature?.[index] ?? null,
+			windHourly.temperature_2m?.[index] ?? null,
 			windHourly.winddirection_10m?.[index] ?? null,
+			marineHourly.wave_direction?.[index] ?? null,
 			marineHourly.time?.[index] ?? null,
 		);
 	} catch (error) {

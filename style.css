@@ -50,6 +50,24 @@ main,
     z-index: 1;
 }
 
+.external-widget {
+    width: min(1120px, calc(100% - 40px));
+    margin: 22px auto 0;
+}
+
+.external-widget-inner {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    padding: 6px 0;
+}
+
+.external-widget-inner table,
+.external-widget-inner iframe,
+.external-widget-inner > div {
+    margin-inline: auto;
+}
+
 main {
     display: grid;
     gap: 24px;
@@ -461,7 +479,8 @@ main {
     .hero,
     .forecast-grid,
     .content-section,
-    .footer {
+    .footer,
+    .external-widget {
         width: min(1120px, calc(100% - 24px));
     }
 }

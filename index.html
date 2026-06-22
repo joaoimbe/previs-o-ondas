@@ -56,7 +56,7 @@
                     <p class="hero-label">Condições do mar em destaque</p>
                     <h2>Confira a previsão antes de entrar na água</h2>
                     <p>
-                        Estrutura base para apresentar swell, vento, maré .
+                        Estrutura base para apresentar swell, vento e maré.
                     </p>
                 </div>
                 <img src="previ.png.jpeg" alt="Vista de surf para a previsão do mar" class="hero-image">
@@ -91,8 +91,18 @@
                 </article>
 
                 <article class="forecast-card">
+                    <h3><span class="forecast-symbol" aria-hidden="true">🌤️</span> Temperatura do ar</h3>
+                    <p id="air-temp">—</p>
+                </article>
+
+                <article class="forecast-card">
                     <h3><span class="forecast-symbol" aria-hidden="true">🧭</span> Direção do vento</h3>
                     <p id="wind-direction">—</p>
+                </article>
+
+                <article class="forecast-card">
+                    <h3><span class="forecast-symbol" aria-hidden="true">🌀</span> Direção da ondulação</h3>
+                    <p id="swell-direction">—</p>
                 </article>
             </div>
         </section>
@@ -100,25 +110,34 @@
         <section id="condicoes" class="content-section" aria-labelledby="condicoes-title">
             <h2 id="condicoes-title">Condições ideais</h2>
             <p>
-<<<<<<< HEAD
-             Fique ligado para mais informações ! se foda
-=======
-             Fique de olho para mais informações , é os guri! se foda
->>>>>>> 3b3730b (ok)
+                Fique de olho para mais informações.
             </p>
         </section>
 
         <section id="sobre" class="content-section" aria-labelledby="sobre-title">
             <h2 id="sobre-title">Sobre o projeto</h2>
             <p>
-<<<<<<< HEAD
-                Foco em facilitar a vida do surfista de forma direta do mar pra sua casa!
-=======
-                Foco em facilitar a vida do surfista de forma direta do mar pra sua casa !
->>>>>>> 3b3730b (ok)
+                Foco em facilitar a vida do surfista de forma direta do mar para sua casa.
             </p>
         </section>
     </main>
+
+        <section class="external-widget" aria-label="Widget de previsão externa">
+                <div class="external-widget-inner">
+                        <script id="wg_fwdg_64818_3_1782136402797">
+(function (window, document) {
+    var loader = function () {
+        var arg = ["s=64818" ,"m=3","uid=wg_fwdg_64818_3_1782136402797" ,"wj=kmh" ,"tj=c" ,"waj=m" ,"tij=cm" ,"odh=0" ,"doh=24" ,"fhours=240" ,"hrsm=3" ,"vt=forecasts" ,"lng=pt" ,"p=WINDSPD,GUST,MWINDSPD,SMER,TMP,TMPE,FLHGT,CDC,TCDC,APCP1s,RATING"];
+        var script = document.createElement("script");
+        var tag = document.getElementsByTagName("script")[0];
+        script.src = "https://www.windguru.cz/js/widget.php?"+(arg.join("&"));
+        tag.parentNode.insertBefore(script, tag);
+    };
+    window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+})(window, document);
+</script>
+                </div>
+        </section>
 
     <footer class="footer">
         <p class="footer-label">Brasil</p>
@@ -135,6 +154,6 @@
         </ul>
     </footer>
     <script src="pwa.js"></script>
-    <script src="script.js?v=20260620-4"></script>
+    <script src="script.js?v=20260622-1"></script>
 </body>
 </html>

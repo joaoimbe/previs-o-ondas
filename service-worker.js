@@ -1,9 +1,9 @@
-const CACHE_NAME = 'previsao-das-ondas-v4';
+const CACHE_NAME = 'previsao-das-ondas-v6';
 const ASSETS_TO_CACHE = [
 	'.',
 	'index.html',
 	'style.css?v=20260620-4',
-	'script.js?v=20260620-4',
+	'script.js?v=20260622-1',
 	'pwa.js',
 	'manifest.json',
 	'favicon.ico.ico',
