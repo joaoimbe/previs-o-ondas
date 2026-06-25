@@ -168,6 +168,8 @@ function updateTideChart(marineHourly, currentIndex) {
 
 	const times = marineHourly?.time || [];
 	const tideValues = marineHourly?.sea_level_height_msl || [];
+	const isCompactView = window.matchMedia('(max-width: 520px)').matches;
+	const labelStep = isCompactView ? 4 : 2;
 
 	if (!times.length || !tideValues.length) {
 		return;
@@ -223,17 +225,29 @@ function updateTideChart(marineHourly, currentIndex) {
 				x: {
 					ticks: {
 						color: '#c2cfda',
-						maxTicksLimit: 4,
+						autoSkip: true,
+						maxRotation: 0,
+						minRotation: 0,
+						font: {
+							size: isCompactView ? 9 : 11,
+						},
+						callback(value, index) {
+							return index % labelStep === 0 || index === labels.length - 1 ? labels[index] : '';
+						},
 					},
 					grid: {
 						display: false,
+						offset: false,
 					},
 				},
 				y: {
 					ticks: {
 						color: '#c2cfda',
 						callback(value) {
-							return `${Number(value).toFixed(1)} m`;
+							return `${Number(value).toFixed(isCompactView ? 2 : 1)} m`;
+						},
+						font: {
+							size: isCompactView ? 9 : 11,
 						},
 					},
 					grid: {

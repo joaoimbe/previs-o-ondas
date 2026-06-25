@@ -523,4 +523,12 @@ main {
     .search-container button {
         width: 100%;
     }
+
+    .forecast-card--tide {
+        min-height: 290px;
+    }
+
+    .tide-chart {
+        height: 160px;
+    }
 }
