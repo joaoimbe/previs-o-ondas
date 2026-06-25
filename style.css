@@ -302,6 +302,26 @@ main {
     animation-delay: 0.33s;
 }
 
+.forecast-card--tide {
+    min-height: 240px;
+    justify-content: flex-start;
+}
+
+.forecast-card--tide p {
+    margin-top: 0;
+}
+
+.tide-chart {
+    margin-top: 14px;
+    height: 120px;
+}
+
+.tide-chart canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
 .forecast-card h3 {
     display: flex;
     align-items: center;

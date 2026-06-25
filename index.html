@@ -114,6 +114,14 @@
                     <h3><span class="forecast-symbol" aria-hidden="true">🌀</span> Direção da ondulação</h3>
                     <p id="swell-direction">—</p>
                 </article>
+
+                <article class="forecast-card forecast-card--tide">
+                    <h3><span class="forecast-symbol" aria-hidden="true">🌊</span> Maré</h3>
+                    <p id="tide">—</p>
+                    <div class="tide-chart" aria-label="Gráfico da maré">
+                        <canvas id="tide-chart"></canvas>
+                    </div>
+                </article>
             </div>
         </section>
 
@@ -130,7 +138,13 @@
                 Foco em facilitar a vida do surfista de forma direta do mar para sua casa.
             </p>
         </section>
-    </main>
+
+        <section id="Surfmappers" class="content-section" aria-labelledby="Surfmappers-title">
+            <h2 id="Surfmappers-title">Surfmappers</h2>
+            <p>
+                Encontre seus momentos surfando <a href="https://www.surfmappers.com/">clique aqui</a>.
+            </p>
+        </section>
 
         <section class="external-widget" aria-label="Widget de previsão externa">
                 <div class="external-widget-inner">
@@ -164,6 +178,7 @@
         </ul>
     </footer>
     <script src="pwa.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <script src="script.js?v=20260622-1"></script>
 </body>
 </html>

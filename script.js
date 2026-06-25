@@ -26,7 +26,11 @@ const forecastElements = {
 	airTemp: document.querySelector('#air-temp'),
 	windDirection: document.querySelector('#wind-direction'),
 	swellDirection: document.querySelector('#swell-direction'),
+	tide: document.querySelector('#tide'),
+	tideChart: document.querySelector('#tide-chart'),
 };
+
+let tideChart = null;
 
 const defaultLocation = {
 	label: 'Imbé - RS',
@@ -72,7 +76,7 @@ function redirectIfSurfBeach(event) {
 }
 
 function getForecastUrl(location) {
-	return `https://marine-api.open-meteo.com/v1/marine?latitude=${location.latitude}&longitude=${location.longitude}&hourly=wave_height,wave_period,wave_direction,sea_surface_temperature&timezone=America/Sao_Paulo`;
+	return `https://marine-api.open-meteo.com/v1/marine?latitude=${location.latitude}&longitude=${location.longitude}&hourly=wave_height,wave_period,wave_direction,sea_surface_temperature,sea_level_height_msl&timezone=America/Sao_Paulo`;
 }
 
 function getWindForecastUrl(location) {
@@ -150,6 +154,97 @@ function getTrend(currentValue, previousValue, threshold = 0) {
 	};
 }
 
+function formatChartTime(value) {
+	return new Date(value).toLocaleTimeString('pt-BR', {
+		hour: '2-digit',
+		minute: '2-digit',
+	});
+}
+
+function updateTideChart(marineHourly, currentIndex) {
+	if (!forecastElements.tideChart || typeof Chart === 'undefined') {
+		return;
+	}
+
+	const times = marineHourly?.time || [];
+	const tideValues = marineHourly?.sea_level_height_msl || [];
+
+	if (!times.length || !tideValues.length) {
+		return;
+	}
+
+	const startIndex = Math.max(0, currentIndex - 3);
+	const endIndex = Math.min(times.length, startIndex + 10);
+	const labels = times.slice(startIndex, endIndex).map(formatChartTime);
+	const values = tideValues.slice(startIndex, endIndex);
+
+	if (tideChart) {
+		tideChart.data.labels = labels;
+		tideChart.data.datasets[0].data = values;
+		tideChart.update();
+		return;
+	}
+
+	const context = forecastElements.tideChart.getContext('2d');
+	if (!context) {
+		return;
+	}
+
+	tideChart = new Chart(context, {
+		type: 'line',
+		data: {
+			labels,
+			datasets: [{
+				data: values,
+				borderColor: '#7fdcff',
+				backgroundColor: 'rgba(127, 220, 255, 0.16)',
+				fill: true,
+				pointRadius: 0,
+				borderWidth: 2,
+				tension: 0.35,
+			}],
+		},
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: {
+					display: false,
+				},
+				tooltip: {
+					callbacks: {
+						label(context) {
+							return `${Number(context.parsed.y).toFixed(2)} m`;
+						},
+					},
+				},
+			},
+			scales: {
+				x: {
+					ticks: {
+						color: '#c2cfda',
+						maxTicksLimit: 4,
+					},
+					grid: {
+						display: false,
+					},
+				},
+				y: {
+					ticks: {
+						color: '#c2cfda',
+						callback(value) {
+							return `${Number(value).toFixed(1)} m`;
+						},
+					},
+					grid: {
+						color: 'rgba(255, 255, 255, 0.08)',
+					},
+				},
+			},
+		},
+	});
+}
+
 function updateForecastDisplay(
 	locationLabel,
 	waveHeight,
@@ -161,6 +256,7 @@ function updateForecastDisplay(
 	airTemp,
 	windDirection,
 	swellDirection,
+	tide,
 	forecastTime,
 ) {
 	const formattedTime = forecastTime
@@ -197,6 +293,10 @@ function updateForecastDisplay(
 	if (forecastElements.windTrend) {
 		forecastElements.windTrend.textContent = windTrend.label;
 		forecastElements.windTrend.className = `forecast-trend ${windTrend.className}`;
+	}
+
+	if (forecastElements.tide) {
+		forecastElements.tide.textContent = formatMeterValue(tide);
 	}
 }
 
@@ -238,8 +338,11 @@ async function loadForecast(location = defaultLocation) {
 			windHourly.temperature_2m?.[index] ?? null,
 			windHourly.winddirection_10m?.[index] ?? null,
 			marineHourly.wave_direction?.[index] ?? null,
+			marineHourly.sea_level_height_msl?.[index] ?? null,
 			marineHourly.time?.[index] ?? null,
 		);
+
+		updateTideChart(marineHourly, index);
 	} catch (error) {
 		forecastElements.status.textContent = 'Falha ao carregar a previsão. Verifique sua conexão.';
 		console.error(error);
