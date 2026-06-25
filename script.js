@@ -17,6 +17,7 @@ const beachKeywords = [
 
 const forecastElements = {
 	status: document.querySelector('#forecast-status'),
+	surfCondition: document.querySelector('#condicaoSurf'),
 	waveHeight: document.querySelector('#wave-height'),
 	waveTrend: document.querySelector('#wave-trend'),
 	windSpeed: document.querySelector('#wind-speed'),
@@ -95,6 +96,34 @@ function getNearestTimeIndex(hourly) {
 	}
 
 	return Math.max(times.length - 1, 0);
+}
+
+function classificarSurf(waveHeight, windSpeed) {
+	if (waveHeight == null || windSpeed == null) {
+		return {
+			texto: 'Dados insuficientes',
+			classe: 'indefinido',
+		};
+	}
+
+	if (waveHeight >= 1.2 && waveHeight <= 2.5 && windSpeed < 15) {
+		return {
+			texto: '🟢 Excelente',
+			classe: 'excelente',
+		};
+	}
+
+	if (waveHeight >= 0.7 && windSpeed < 25) {
+		return {
+			texto: '🟡 Regular',
+			classe: 'regular',
+		};
+	}
+
+	return {
+		texto: '🔴 Ruim',
+		classe: 'ruim',
+	};
 }
 
 function formatMeterValue(value) {
@@ -311,6 +340,12 @@ function updateForecastDisplay(
 
 	if (forecastElements.tide) {
 		forecastElements.tide.textContent = formatMeterValue(tide);
+	}
+
+	if (forecastElements.surfCondition) {
+		const resultado = classificarSurf(waveHeight, windSpeed);
+		forecastElements.surfCondition.textContent = resultado.texto;
+		forecastElements.surfCondition.className = `surf-condition ${resultado.classe}`;
 	}
 }
 
